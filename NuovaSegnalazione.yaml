@@ -1,0 +1,196 @@
+kind: AdaptiveDialog
+modelDescription: Deve catturare frasi come ""ho un problema", "segnalo un errore", "non funziona", "voglio segnalare", "c'è un bug"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    triggerQueries:
+      - non trovo la ricevuta
+      - non riesco a trovare la ricevuta
+      - ricevuta di pagamento
+      - avviso di pagamento
+      - non vedo il pagamento
+      - problema con il pagamento
+      - pagamento non visibile
+      - pagamento non registrato
+      - pagamento non trovato
+      - ricevuta non disponibile
+      - ricevuta mancante
+      - ricevuta non scaricabile
+      - non riesco a scaricare la ricevuta
+      - download ricevuta non funziona
+      - errore durante il pagamento
+      - errore pagamento pagoPA
+      - pagamento fallito
+      - pagamento respinto
+      - pagamento annullato
+      - pagamento bloccato
+      - transazione non riuscita
+      - transazione rifiutata
+      - esito pagamento negativo
+      - pagamento in attesa
+      - pagamento sospeso
+      - pagamento duplicato
+      - ho pagato ma non risulta
+      - ho effettuato il pagamento ma non lo vedo
+      - pagamento eseguito ma non registrato
+      - pagamento addebitato ma non confermato
+      - addebito senza ricevuta
+      - mi hanno addebitato due volte
+      - doppio pagamento
+      - pagamento contabilizzato male
+      - importo errato
+      - importo non corretto
+      - cifra addebitata diversa
+      - errore importo pagamento
+      - avviso non trovato
+      - codice avviso non valido
+      - IUV non valido
+      - IUV non riconosciuto
+      - codice pagamento errato
+      - QR code non funziona
+      - errore codice fiscale
+      - ente non trovato
+      - ente creditore non disponibile
+      - servizio temporaneamente non disponibile
+      - errore tecnico
+      - errore di sistema
+      - pagina di pagamento non disponibile
+      - timeout durante il pagamento
+      - sessione scaduta
+      - accesso non riuscito
+      - problema autenticazione
+      - SPID non funziona
+      - CIE non funziona
+      - errore accesso pagoPA
+      - errore durante autenticazione
+      - carta non accettata
+      - pagamento con carta non riuscito
+      - IBAN non valido
+      - errore banca
+      - errore PSP
+      - problema con il prestatore di servizi di pagamento
+      - pagamento non autorizzato
+      - errore verifica pagamento
+      - stato pagamento sconosciuto
+      - non riesco a recuperare la ricevuta
+      - non riesco a recuperare il pagamento
+      - non trovo la transazione
+      - ricevuta telematica non disponibile
+      - RT non disponibile
+      - RT non trovata
+      - quietanza non disponibile
+      - quietanza non trovata
+      - pagamento non aggiornato
+      - pagamento non sincronizzato
+      - pagamento ancora pendente
+      - ricevuta arrivata in ritardo
+      - email ricevuta non arrivata
+      - notifica pagamento non ricevuta
+      - conferma pagamento assente
+      - problema con avviso pagoPA
+      - errore compilazione pagamento
+      - errore inserimento dati
+      - errore durante conferma pagamento
+      - pagamento interrotto
+      - pagamento non completato
+      - operazione non conclusa
+      - impossibile completare il pagamento
+      - impossibile verificare il pagamento
+      - non riesco a pagare
+      - non riesco ad aprire l'avviso
+      - link pagamento non funzionante
+      - errore recupero avviso
+      - errore recupero ricevuta
+
+  actions:
+    - kind: Question
+      id: question_U4v8tm
+      interruptionPolicy:
+        allowInterruption: true
+      variable: Global.TestoSegnalazione
+      prompt: Descrivi brevemente il problema
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: question_t5FAg4
+      interruptionPolicy:
+        allowInterruption: true
+      variable: Global.CategoriaSegnalazione
+      prompt: In quale categoria rientra? (tecnico / amministrativo / altro)
+      entity:
+        kind: EmbeddedEntity
+        definition:
+          kind: ClosedListEntity
+          items:
+            - id: tecnico
+              displayName: tecnico
+            - id: amministrativo
+              displayName: amministrativo
+            - id: altro
+              displayName: altro
+
+    - kind: SendActivity
+      id: sendActivity_HjzSNS
+      activity: Grazie. Sto cercando i casi simili già gestiti...
+
+    - kind: BeginDialog
+      id: wsMVbr
+      input:
+        binding:
+          testo: =Global.TestoSegnalazione
+      dialog: cra3b_Sharp4AiDemo.action.Sharp4AIDemoAPI-Sharp4AIDemoAPI
+      output:
+        binding:
+          tickets: init:Topic.tickets
+
+    - kind: SetVariable
+      id: setVariable_init_summary
+      variable: Topic.TicketSummary
+      value: ""
+
+    - kind: Foreach
+      id: foreach_wSJ4z9
+      items: =Topic.tickets
+      value: Topic.CurrentTicket
+      index: Topic.LoopIndex
+      actions:
+        - kind: SetVariable
+          id: setVariable_build_summary
+          variable: Topic.TicketSummary
+          value: '=Concatenate(Topic.TicketSummary, "• ", Left(Topic.CurrentTicket.titolo, 80), Char(10), "  Soluzione: ", If(IsBlank(Topic.CurrentTicket.soluzione), "N/D", Left(Topic.CurrentTicket.soluzione, 150)), Char(10), Char(10))'
+
+    - kind: SendActivity
+      id: sendActivity_summary_ready
+      activity: Ho trovato alcuni casi simili per la tua segnalazione
+
+    - kind: SendActivity
+      id: sendActivity_show_results
+      activity: "{Topic.TicketSummary}"
+
+    - kind: SendActivity
+      id: sendActivity_closing
+      activity: La tua segnalazione è stata inviata all'helpdesk. Un operatore ti ricontatterà a breve.
+
+    - kind: HttpRequestAction
+      id: pN6Ixo
+      method: Post
+      url: https://muskrat-loved-openly.ngrok-free.app/api/mail/mailsenderjobcopilot
+      body:
+        kind: JsonRequestContent
+        content:
+          cognome: "Demo"
+          nome: =System.User.DisplayName
+          telefono: ""
+          mail: =System.User.Email
+          tipologiaSegnalazione: =Global.CategoriaSegnalazione
+          descrizioneProblema: =Global.TestoSegnalazione
+          codiceIpa: "C_B819"
+          nomeEnte: "Carpi"
+          codiceFiscalePartitaIva: "DEMO00000000000"
+          crmTickets: =Topic.tickets
+      errorHandling:
+        kind: ContinueOnErrorBehavior
+
+inputType: {}
+outputType: {}

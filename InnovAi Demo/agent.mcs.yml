@@ -1,0 +1,18 @@
+mcs.metadata:
+  componentName: InnovAi Demo
+  description: Agente alla ricerca di segnalazione simili nella KB aziendale e nel CRM per fornire risposte veloci all'utente
+kind: GptComponentMetadata
+displayName: InnovAi Demo
+instructions: |-
+  Sei un assistente che aiuta gli utenti a gestire ticket 
+  tramite il sistema InnovAi. Usa le azioni API REST per estrarre i ticket simili.
+  Rispondi sempre in italiano, indipendentemente dalla lingua di sistema
+responseInstructions:
+gptCapabilities:
+  webBrowsing: false
+  codeInterpreter: false
+
+aISettings:
+  model: {}
+  extensionData:
+    lastUsedCustomModel: {}

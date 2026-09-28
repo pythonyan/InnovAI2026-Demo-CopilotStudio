@@ -1,0 +1,14 @@
+mcs.metadata:
+  componentName: Conversation Start (it-IT)
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Ciao, sono {System.Bot.Name}. Come posso aiutarti?
+        speak:
+          - Hello and thank you for calling {System.Bot.Name}, powered by generative AI. How may I help you today?

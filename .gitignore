@@ -1,0 +1,6 @@
+# Metadati locali Copilot Studio VS Code extension (env-specific, mai committare)
+**/.mcs/conn.json
+**/.mcs/changetoken.txt
+**/.mcs/.connectors-download.json
+**/.mcs/.connectors-sync.json
+**/.mcs/.knowledge-sync.json

@@ -1,0 +1,17 @@
+mcs.metadata:
+  componentName: InnovAI Demo API - InnovAI Demo API
+kind: TaskDialog
+modelDescription: Analizza similarità tra testo e ticket CRM esistenti
+outputs:
+  - propertyName: tickets
+
+action:
+  kind: InvokeConnectorTaskAction
+  connectionReference: cra3b_Sharp4AiDemo.shared_cra3b-5finnovai-20demo-20api-5fafc63f1e33b93dd5.3143893449b349d58ca60cafd2014ec1
+  connectionProperties:
+    mode: Invoker
+
+  operationId: CalculateSimilarity
+  aIPluginOperationExportKey: aiplugin.name=msdynaip_3fe289fc-c5d1-44a9-aa1b-2805bd681278,operationid=msdynaip_CalculateSimilarity
+
+outputMode: All

@@ -1,0 +1,8 @@
+mcs.metadata:
+  componentName: TestoSegnalazione
+kind: Variable
+name: TestoSegnalazione
+scope: User
+isExternalInitializationAllowed: false
+isOutputToExternalCallers: false
+initializationTimeoutInMilliseconds: 0

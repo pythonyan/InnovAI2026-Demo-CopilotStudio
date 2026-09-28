@@ -1,0 +1,15 @@
+﻿{
+  "api_key": {
+    "type": "securestring",
+    "uiDefinition": {
+      "displayName": "ApiKey",
+      "description": "ApiKey",
+      "tooltip": "ApiKey",
+      "constraints": {
+        "tabIndex": 2,
+        "clearText": false,
+        "required": "true"
+      }
+    }
+  }
+}

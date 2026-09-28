@@ -1,0 +1,9 @@
+mcs.metadata:
+  componentName: CategoriaSegnalazione
+  description: Categoria segnalazione
+kind: Variable
+name: CategoriaSegnalazione
+scope: User
+isExternalInitializationAllowed: false
+isOutputToExternalCallers: false
+initializationTimeoutInMilliseconds: 0

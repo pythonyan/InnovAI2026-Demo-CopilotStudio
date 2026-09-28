@@ -1,0 +1,7 @@
+﻿connectionReferences:
+  - connectionReferenceLogicalName: cra3b_Sharp4AiDemo.shared_a365copilotchatmcp.shared-a365copilotch-f50e6a40-0cbe-402a-84bd-bc42bbdd788d
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_a365copilotchatmcp
+  - connectionReferenceLogicalName: cra3b_Sharp4AiDemo.shared_a365memcp.shared-a365memcp-7ded694f-38fe-4ed9-a709-0eb6eab1ace5
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_a365memcp
+  - connectionReferenceLogicalName: cra3b_Sharp4AiDemo.shared_cra3b-5finnovai-20demo-20api-5fafc63f1e33b93dd5.3143893449b349d58ca60cafd2014ec1
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_cra3b-5finnovai-20demo-20api-5fafc63f1e33b93dd5

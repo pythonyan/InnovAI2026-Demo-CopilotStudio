@@ -1,0 +1,19 @@
+mcs.metadata:
+  componentName: Grazie (it-IT)
+kind: AdaptiveDialog
+modelDescription: "Questo strumento è in grado di gestire query come queste: grazie, grazie tanto"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Thank you
+    triggerQueries:
+      - thanks
+      - thank you
+      - thanks so much
+      - ty
+
+  actions:
+    - kind: SendActivity
+      id: sendMessage_9iz6v7
+      activity: E' stato un piacere.

@@ -1,0 +1,30 @@
+mcs.metadata:
+  componentName: Inizio-fine conversazione (it-IT)
+kind: AdaptiveDialog
+modelDescription: "Questo strumento è in grado di gestire query come queste: Ciao, A presto, Arrivederci, No grazie."
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Goodbye
+    triggerQueries:
+      - Bye
+      - Bye for now
+      - Bye now
+      - Good bye
+      - No thank you. Goodbye.
+      - See you later
+
+  actions:
+    - kind: Question
+      id: question_zf2HhP
+      prompt: Vuoi chiudere la conversazione?
+
+    - kind: ConditionGroup
+      id: condition_DGc1Wy
+      conditions:
+        - id: condition_DGc1Wy-item-1
+          actions:
+            - kind: SendActivity
+              id: sendMessage_LdLhmf
+              activity: Avanti. Sto ascoltando.

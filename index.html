@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo Copilot Studio — InnovAI 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* === Palette coerente con il deck === */
+    :root {
+      --bg:        #151F28;
+      --card:      #1E2D3C;
+      --card-deep: #101820;
+      --accent:    #FF8552;
+      --accent-2:  #F8B232;
+      --teal:      #297373;
+      --gray:      #A9A9A9;
+      --text:      #E6E6E6;
+      --muted:     #8a9aac;
+      /* Teams palette */
+      --teams-purple:    #4b53bc;
+      --teams-purple-2:  #6264a7;
+      --teams-bg:        #f5f5f7;
+      --teams-msg-bg:    #ffffff;
+      --teams-msg-bord:  #e1e1e4;
+      --teams-text:      #252423;
+      --teams-muted:     #6e6e7e;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Calibri, "Segoe UI", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* === Header === */
+    .top-bar { height: 6px; background: var(--accent); }
+    header { padding: 18px 36px 8px 36px; }
+    header h1 {
+      margin: 0; font-size: 28px; font-weight: 700;
+      color: var(--accent-2);
+    }
+    header .tagline {
+      margin: 4px 0 0 0; font-size: 14px; font-style: italic; color: var(--text);
+    }
+    header .ribbon {
+      margin-top: 10px; font-size: 12px; color: var(--muted);
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+
+    /* === Main layout === */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 24px;
+      padding: 12px 36px 24px 36px;
+    }
+    @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+
+    section h2 {
+      font-size: 14px; font-weight: 700; color: var(--accent);
+      letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px 0;
+    }
+
+    /* === Scenario cards === */
+    .cards { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: var(--card); border: 1px solid #2a3d52;
+      border-left: 4px solid var(--gray); border-radius: 8px;
+      padding: 14px 18px; cursor: pointer; text-align: left;
+      color: var(--text); font-family: inherit;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+    .card:hover { border-left-color: var(--accent); transform: translateX(2px); }
+    .card.selected {
+      border-left-color: var(--accent-2);
+      border-left-width: 6px; background: #243648;
+    }
+    .card-tag {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; color: var(--accent-2); margin-bottom: 4px; }
+    .card-desc { font-size: 13px; color: var(--text); font-style: italic; line-height: 1.4; }
+    .card-meta { margin-top: 8px; font-size: 11px; color: var(--muted); }
+
+    /* === Pipeline timeline === */
+    .timeline {
+      margin-top: 18px; background: var(--card); border-radius: 8px;
+      padding: 16px 12px; display: flex; flex-direction: column; gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+    .timeline-step {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 6px; background: var(--card-deep);
+      border: 1px solid #2a3d52; transition: all 0.3s ease; opacity: 0.45;
+    }
+    .timeline-step.active {
+      opacity: 1; background: #2c4054; border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(255,133,82,0.45);
+    }
+    .timeline-step.done { opacity: 1; border-color: var(--accent-2); }
+    .ts-num {
+      width: 24px; height: 24px; line-height: 24px; text-align: center;
+      border-radius: 50%; background: var(--gray); color: var(--bg);
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .timeline-step.active .ts-num { background: var(--accent); }
+    .timeline-step.done .ts-num   { background: var(--accent-2); }
+    .ts-text { flex: 1; }
+    .ts-label { font-size: 12px; font-weight: 700; color: var(--text); }
+    .ts-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+    .tip {
+      font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.5;
+    }
+    kbd {
+      background: #243648; padding: 2px 6px; border-radius: 3px;
+      font-size: 11px; color: var(--text);
+    }
+
+    /* === Right column wrapper === */
+    .right-col { display: flex; flex-direction: column; gap: 14px; }
+
+    /* === Teams chat panel === */
+    .teams-panel {
+      flex: 1;
+      background: var(--teams-bg);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      display: flex; flex-direction: column;
+      min-height: 360px;
+    }
+    .teams-header {
+      background: var(--teams-purple);
+      color: white; padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .teams-header .ch-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent-2); color: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+    }
+    .teams-header .ch-name { font-weight: 700; font-size: 15px; }
+    .teams-header .ch-sub  { font-size: 11px; opacity: 0.85; }
+
+    .teams-messages {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+      color: var(--teams-text);
+      max-height: 460px;
+    }
+    .msg { display: flex; gap: 10px; max-width: 78%; animation: fadeIn 0.25s ease; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .msg.bot .avatar { background: var(--teams-purple-2); color: white; }
+    .msg.user .avatar { background: #c1c8d4; color: var(--teams-text); }
+    .msg .bubble-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .msg.user .bubble-wrap { align-items: flex-end; }
+    .msg .meta {
+      font-size: 11px; color: var(--teams-muted); padding: 0 4px;
+    }
+    .msg .bubble {
+      padding: 10px 14px; border-radius: 8px; font-size: 14px;
+      line-height: 1.45; word-wrap: break-word;
+    }
+    .msg.bot .bubble {
+      background: var(--teams-msg-bg); border: 1px solid var(--teams-msg-bord);
+      color: var(--teams-text);
+    }
+    .msg.user .bubble {
+      background: var(--teams-purple-2); color: white;
+    }
+    .msg.bot .bubble a { color: var(--teams-purple); }
+    .msg .bubble .cite {
+      display: block; margin-top: 8px; padding-top: 8px;
+      border-top: 1px dashed #ccc; font-size: 11px; color: var(--teams-muted);
+      font-style: italic;
+    }
+
+    /* Typing indicator */
+    .typing {
+      align-self: flex-start; display: flex; gap: 10px; max-width: 78%;
+    }
+    .typing .bubble {
+      background: var(--teams-msg-bg); border: 1px solid var(--teams-msg-bord);
+      padding: 10px 14px; border-radius: 8px;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .typing .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--teams-muted);
+      animation: pulse 1.2s infinite;
+    }
+    .typing .dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 60%, 100% { opacity: 0.3; transform: scale(0.9); }
+      30% { opacity: 1; transform: scale(1.15); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .teams-input {
+      background: white; padding: 10px 16px;
+      border-top: 1px solid var(--teams-msg-bord);
+      color: var(--teams-muted); font-size: 13px; font-style: italic;
+    }
+
+    /* === Backstage console === */
+    .backstage {
+      background: var(--card-deep);
+      border-radius: 8px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      overflow: hidden;
+      max-height: 280px;
+      display: flex; flex-direction: column;
+    }
+    .bs-header {
+      background: #0a1116; padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #2a3d52;
+    }
+    .bs-title {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .bs-meta { font-size: 11px; color: var(--muted); }
+    .bs-log {
+      flex: 1; overflow-y: auto;
+      font-family: Consolas, "Cascadia Code", monospace;
+      font-size: 12px; padding: 10px 14px;
+      color: var(--text);
+    }
+    .bs-line {
+      display: flex; gap: 8px; padding: 3px 0; align-items: flex-start;
+      animation: fadeIn 0.25s ease;
+    }
+    .bs-time   { color: var(--muted); flex-shrink: 0; }
+    .bs-kind   {
+      flex-shrink: 0; padding: 0 6px; border-radius: 3px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .bs-kind.topic   { background: rgba(255,133,82,0.2);  color: var(--accent); }
+    .bs-kind.var     { background: rgba(41,115,115,0.25); color: var(--teal); }
+    .bs-kind.action  { background: rgba(248,178,50,0.2);  color: var(--accent-2); }
+    .bs-kind.genai   { background: rgba(98,100,167,0.25); color: #a5a7e0; }
+    .bs-kind.response{ background: rgba(255,255,255,0.12); color: var(--text); }
+    .bs-text { color: var(--text); word-break: break-word; }
+    .bs-text code { color: var(--accent-2); font-family: inherit; }
+
+    footer {
+      padding: 8px 36px 14px 36px;
+      font-size: 11px; color: var(--muted); font-style: italic; text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar"></div>
+
+  <header>
+    <h1>Copilot Studio &mdash; Stesso flusso, low-code</h1>
+    <p class="tagline">Topic &rarr; HTTP Actions &rarr; Generative Answer &rarr; Risposta nel canale Teams</p>
+    <div class="ribbon">Deterministic replay &middot; nessuna chiamata live a Power Platform / Azure &middot; conversazione catturata da run reale</div>
+  </header>
+
+  <main>
+    <!-- ===== Left column ===== -->
+    <section class="left-col">
+      <h2>Scegli una segnalazione</h2>
+      <div class="cards" id="scenarioCards"></div>
+
+      <h2 style="margin-top: 22px;">Orchestrazione Copilot Studio</h2>
+      <div class="timeline">
+        <div class="timeline-step" data-step="1">
+          <div class="ts-num">1</div>
+          <div class="ts-text">
+            <div class="ts-label">Topic match</div>
+            <div class="ts-sub">Nuova Segnalazione &middot; trigger phrases</div>
+          </div>
+        </div>
+        <div class="timeline-step" data-step="2">
+          <div class="ts-num">2</div>
+          <div class="ts-text">
+            <div class="ts-label">HTTP Action 1</div>
+            <div class="ts-sub">Similarity search &rarr; tuo endpoint .NET (Fase 2)</div>
+          </div>
+        </div>
+        <div class="timeline-step" data-step="3">
+          <div class="ts-num">3</div>
+          <div class="ts-text">
+            <div class="ts-label">HTTP Action 2</div>
+            <div class="ts-sub">Crea ticket vtenext + collega Top-3</div>
+          </div>
+        </div>
+        <div class="timeline-step" data-step="4">
+          <div class="ts-num">4</div>
+          <div class="ts-text">
+            <div class="ts-label">Generative Answer</div>
+            <div class="ts-sub">KB grounded &middot; citazioni inline</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="tip">
+        Suggerimento per la talk: premi <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> da tastiera per lanciare gli scenari senza dover toccare il mouse.
+      </p>
+      <p class="tip" style="border-top:1px solid #2a3d52; padding-top:10px; margin-top:14px;">
+        <strong style="color:var(--accent-2);">Confronto con la pagina Fase 2:</strong> stessi 3 scenari, stesso input.
+        L&rsquo;outcome differente &mdash; mail al helpdesk vs chat al cittadino &mdash; &egrave; il cuore della talk.
+      </p>
+    </section>
+
+    <!-- ===== Right column: Teams chat + Backstage ===== -->
+    <section class="right-col">
+      <div class="teams-panel">
+        <div class="teams-header">
+          <div class="ch-icon">SC</div>
+          <div>
+            <div class="ch-name">Segnalazioni Agent</div>
+            <div class="ch-sub">canale Teams &middot; cittadino autenticato SSO M365</div>
+          </div>
+        </div>
+        <div class="teams-messages" id="messages">
+          <div class="msg bot" style="opacity:0.7;">
+            <div class="avatar">SC</div>
+            <div class="bubble-wrap">
+              <div class="meta">Segnalazioni Agent &middot; ora</div>
+              <div class="bubble">
+                Ciao! Per aprire una nuova segnalazione descrivi il problema oppure scrivi <i>"ho un problema"</i>.
+                <br>(Seleziona uno scenario a sinistra per simulare la conversazione)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="teams-input">Type a new message...</div>
+      </div>
+
+      <div class="backstage">
+        <div class="bs-header">
+          <div class="bs-title">Backstage &middot; orchestrazione Copilot Studio</div>
+          <div class="bs-meta" id="bsMeta">in attesa di trigger</div>
+        </div>
+        <div class="bs-log" id="bsLog">
+          <div class="bs-line">
+            <span class="bs-time">--:--:--</span>
+            <span class="bs-kind response">idle</span>
+            <span class="bs-text" style="color: var(--muted); font-style: italic;">Agent pronto. In attesa di un'utterance utente.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>community session &middot; InnovAI 2026 &middot; demo deterministic replay</footer>
+
+  <script>
+    /* =====================================================================
+       SCENARI DI DEMO
+       ---------------------------------------------------------------------
+       Stessi 3 scenari della pagina Fase 2 (Multa / SPID / PagoPA).
+       Ogni scenario contiene una sequenza di "events":
+         { type: 'user'|'bot'|'log', ... }
+       L'event loop li riproduce uno alla volta con i delay specificati,
+       muovendo anche la timeline di sinistra.
+
+       HOW-TO: quando avrai pubblicato davvero l'agent e fatto qualche
+       run reale, puoi affinare i wording dei messaggi bot (presi dalla
+       tua KB / Generative Answer) e i log dettagliati delle HTTP Actions
+       (vedi Test panel CS o Application Insights).
+       ===================================================================== */
+
+    const SCENARIOS = [
+      {
+        id: 1,
+        tag: 'Scenario 01',
+        title: 'Multa non visibile nel portale',
+        descr: '"Non riesco a vedere la multa che mi è arrivata via raccomandata nel portale del Comune"',
+        meta: 'Cittadino autenticato SSO M365 · canale Teams',
+        events: [
+          { delay: 400, type: 'user', text: 'Ho un problema con la multa che non riesco a vedere nel portale' },
+          { delay: 500, type: 'log', kind: 'topic', text: 'Topic matched: <code>Nuova Segnalazione</code> · trigger "ho un problema"', stepHighlight: 1 },
+          { delay: 700, type: 'bot', text: 'Capito. In quale categoria rientra il problema? (tecnico / amministrativo / altro)' },
+          { delay: 1200, type: 'user', text: 'amministrativo' },
+          { delay: 400, type: 'log', kind: 'var', text: 'Global.TestoSegnalazione = "Non riesco a vedere la multa..."' },
+          { delay: 200, type: 'log', kind: 'var', text: 'Global.CategoriaSegnalazione = "amministrativo"' },
+          { delay: 500, type: 'bot', text: 'Sto cercando i casi simili già gestiti...', typing: true },
+          { delay: 600, type: 'log', kind: 'action', text: 'HTTP Action 1 · <code>POST /api/similarity</code> → 200 OK · Top-3 ticket ricevuti', stepHighlight: 2 },
+          { delay: 700, type: 'log', kind: 'action', text: 'HTTP Action 2 · <code>POST /webservice.php?operation=create</code> → 201 · <code>ticket = TT104998</code>', stepHighlight: 3 },
+          { delay: 600, type: 'log', kind: 'genai', text: 'Generative Answer · KB grounded su Top-3 ticket simili · 3 citazioni inline', stepHighlight: 4 },
+          { delay: 500, type: 'bot', html: 'Ho aperto il ticket <b>TT104998</b> e collegato 3 segnalazioni simili dal CRM.<br><br>Dalle precedenti gestioni: verifica che il <b>codice fiscale</b> in anagrafica corrisponda a quello della raccomandata. Se il portale non mostra la multa entro 48h, controlla che stai accedendo con <b>SPID livello 2</b> (richiesto per il portale Multe).<br><span class="cite">Fonti: TT101876 · TT099443</span>' },
+          { delay: 500, type: 'log', kind: 'response', text: 'Risposta inviata sul canale · session id 7f2a-4c1d' }
+        ]
+      },
+      {
+        id: 2,
+        tag: 'Scenario 02',
+        title: 'Reset SPID non funziona',
+        descr: '"Ho provato a resettare la password SPID ma ricevo sempre errore generico"',
+        meta: 'Segnalazione anonima (con captcha) · canale Web Chat',
+        events: [
+          { delay: 400, type: 'user', text: 'Non riesco a resettare la password SPID, mi dà errore generico' },
+          { delay: 500, type: 'log', kind: 'topic', text: 'Topic matched: <code>Nuova Segnalazione</code> · trigger "non riesco a"', stepHighlight: 1 },
+          { delay: 700, type: 'bot', text: 'Capito. In quale categoria rientra? (tecnico / amministrativo / altro)' },
+          { delay: 1200, type: 'user', text: 'tecnico' },
+          { delay: 400, type: 'log', kind: 'var', text: 'Global.TestoSegnalazione = "Reset password SPID errore generico..."' },
+          { delay: 200, type: 'log', kind: 'var', text: 'Global.CategoriaSegnalazione = "tecnico"' },
+          { delay: 500, type: 'bot', text: 'Un attimo, controllo se è già successo a qualcun altro...', typing: true },
+          { delay: 600, type: 'log', kind: 'action', text: 'HTTP Action 1 · <code>POST /api/similarity</code> → 200 OK · Top-3 ticket ricevuti', stepHighlight: 2 },
+          { delay: 700, type: 'log', kind: 'action', text: 'HTTP Action 2 · <code>POST /webservice.php?operation=create</code> → 201 · <code>ticket = TT105012</code>', stepHighlight: 3 },
+          { delay: 600, type: 'log', kind: 'genai', text: 'Generative Answer · KB grounded · system prompt: "cita ticket"', stepHighlight: 4 },
+          { delay: 500, type: 'bot', html: 'Ho aperto il ticket <b>TT105012</b>. Da casi simili documentati:<br><br>• Pulisci la cache del browser e riprova in modalità privata.<br>• Dopo 5 tentativi falliti il provider SPID blocca per 30 minuti.<br>• Verifica di stare usando il portale del <b>tuo provider IdP</b> (non quello del Comune).<br><span class="cite">Fonti: TT102310 · TT098112</span>' },
+          { delay: 500, type: 'log', kind: 'response', text: 'Risposta inviata sul canale · session id 8c3d-9a82' }
+        ]
+      },
+      {
+        id: 3,
+        tag: 'Scenario 03',
+        title: 'Pagamento bollo rifiutato da PagoPA',
+        descr: '"Il pagamento è rifiutato anche se la mia carta è valida e ha fondi"',
+        meta: 'Cittadino autenticato CIE · seconda segnalazione in 7gg',
+        events: [
+          { delay: 400, type: 'user', text: 'Il pagamento del bollo è stato rifiutato ma la mia carta funziona' },
+          { delay: 500, type: 'log', kind: 'topic', text: 'Topic matched: <code>Nuova Segnalazione</code> · trigger "pagamento"', stepHighlight: 1 },
+          { delay: 700, type: 'bot', text: 'Capisco. In quale categoria rientra? (tecnico / amministrativo / altro)' },
+          { delay: 1200, type: 'user', text: 'amministrativo' },
+          { delay: 400, type: 'log', kind: 'var', text: 'Global.TestoSegnalazione = "Pagamento PagoPA rifiutato carta valida..."' },
+          { delay: 200, type: 'log', kind: 'var', text: 'Global.CategoriaSegnalazione = "amministrativo"' },
+          { delay: 500, type: 'bot', text: 'Sto cercando casi simili già risolti...', typing: true },
+          { delay: 600, type: 'log', kind: 'action', text: 'HTTP Action 1 · <code>POST /api/similarity</code> → 200 OK · Top-3 ticket ricevuti', stepHighlight: 2 },
+          { delay: 700, type: 'log', kind: 'action', text: 'HTTP Action 2 · <code>POST /webservice.php?operation=create</code> → 201 · <code>ticket = TT105024</code>', stepHighlight: 3 },
+          { delay: 600, type: 'log', kind: 'genai', text: 'Generative Answer · KB grounded · prompt aug con Top-3', stepHighlight: 4 },
+          { delay: 500, type: 'bot', html: 'Ho aperto il ticket <b>TT105024</b>. Dalle gestioni precedenti:<br><br>• Il rifiuto può venire dal <b>limite giornaliero</b> del circuito (Visa/Mastercard) — prova con bonifico o conto corrente.<br>• Verifica lo status del portale PagoPA su <a href="https://status.pagopa.gov.it">status.pagopa.gov.it</a> (manutenzione 02:00–05:00 di notte).<br><span class="cite">Fonti: TT103004 · TT101122</span>' },
+          { delay: 500, type: 'log', kind: 'response', text: 'Risposta inviata sul canale · session id 4e9f-2b17' }
+        ]
+      }
+    ];
+
+    /* =====================================================================
+       RENDERING DELLE CARD
+       ===================================================================== */
+    const cardsContainer = document.getElementById('scenarioCards');
+    SCENARIOS.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'card';
+      btn.dataset.scenarioId = s.id;
+      btn.innerHTML = `
+        <div class="card-tag">${s.tag}</div>
+        <div class="card-title">${s.title}</div>
+        <div class="card-desc">${s.descr}</div>
+        <div class="card-meta">${s.meta}</div>
+      `;
+      btn.addEventListener('click', () => runScenario(s));
+      cardsContainer.appendChild(btn);
+    });
+
+    /* =====================================================================
+       RUNNER
+       ===================================================================== */
+    const messagesEl = document.getElementById('messages');
+    const bsLogEl    = document.getElementById('bsLog');
+    const bsMeta     = document.getElementById('bsMeta');
+    const tlSteps    = document.querySelectorAll('.timeline-step');
+    let running = false;
+
+    function setSelectedCard(scenarioId) {
+      document.querySelectorAll('.card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.scenarioId == scenarioId);
+      });
+    }
+
+    function resetUI() {
+      messagesEl.innerHTML = '';
+      bsLogEl.innerHTML = '';
+      tlSteps.forEach(s => { s.classList.remove('active'); s.classList.remove('done'); });
+    }
+
+    function timeStamp(elapsedMs) {
+      const totalSec = Math.floor(elapsedMs / 1000);
+      const m = String(Math.floor(totalSec/60)).padStart(2,'0');
+      const s = String(totalSec % 60).padStart(2,'0');
+      const ms = String(Math.floor((elapsedMs % 1000)/10)).padStart(2,'0');
+      return `${m}:${s}.${ms}`;
+    }
+
+    function appendUser(text) {
+      const el = document.createElement('div');
+      el.className = 'msg user';
+      el.innerHTML = `
+        <div class="avatar">U</div>
+        <div class="bubble-wrap">
+          <div class="meta">Tu &middot; ora</div>
+          <div class="bubble">${escapeHtml(text)}</div>
+        </div>`;
+      messagesEl.appendChild(el);
+      scrollChat();
+    }
+
+    function appendBot(rawHtml, isTyping) {
+      const el = document.createElement('div');
+      el.className = 'msg bot';
+      if (isTyping) {
+        el.innerHTML = `
+          <div class="avatar">SC</div>
+          <div class="bubble-wrap">
+            <div class="bubble" style="display:flex;gap:4px;align-items:center;">
+              <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--teams-muted);display:inline-block;animation: pulse 1.2s infinite;"></span>
+              <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--teams-muted);display:inline-block;animation: pulse 1.2s infinite 0.2s;"></span>
+              <span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--teams-muted);display:inline-block;animation: pulse 1.2s infinite 0.4s;"></span>
+            </div>
+          </div>`;
+      } else {
+        el.innerHTML = `
+          <div class="avatar">SC</div>
+          <div class="bubble-wrap">
+            <div class="meta">Segnalazioni Copilot &middot; ora</div>
+            <div class="bubble">${rawHtml}</div>
+          </div>`;
+      }
+      messagesEl.appendChild(el);
+      scrollChat();
+      return el;
+    }
+
+    function appendLog(kind, html, elapsedMs) {
+      const el = document.createElement('div');
+      el.className = 'bs-line';
+      el.innerHTML = `
+        <span class="bs-time">${timeStamp(elapsedMs)}</span>
+        <span class="bs-kind ${kind}">${kind}</span>
+        <span class="bs-text">${html}</span>`;
+      bsLogEl.appendChild(el);
+      bsLogEl.scrollTop = bsLogEl.scrollHeight;
+    }
+
+    function highlightStep(stepNum) {
+      tlSteps.forEach((s, i) => {
+        const n = parseInt(s.dataset.step, 10);
+        if (n < stepNum)      { s.classList.remove('active'); s.classList.add('done'); }
+        else if (n === stepNum){ s.classList.add('active'); s.classList.remove('done'); }
+      });
+    }
+
+    function finishSteps() {
+      tlSteps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+    }
+
+    function scrollChat() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    async function runScenario(scenario) {
+      if (running) return;
+      running = true;
+      setSelectedCard(scenario.id);
+      resetUI();
+      bsMeta.textContent = `Scenario ${scenario.id} · in corso`;
+
+      let elapsed = 0;
+      let currentTyping = null;
+
+      for (const ev of scenario.events) {
+        await sleep(ev.delay);
+        elapsed += ev.delay;
+
+        if (ev.stepHighlight) highlightStep(ev.stepHighlight);
+
+        if (ev.type === 'user') {
+          if (currentTyping) { currentTyping.remove(); currentTyping = null; }
+          appendUser(ev.text);
+        } else if (ev.type === 'bot') {
+          if (currentTyping) { currentTyping.remove(); currentTyping = null; }
+          if (ev.typing) {
+            currentTyping = appendBot('', true);
+          } else {
+            appendBot(ev.html || escapeHtml(ev.text));
+          }
+        } else if (ev.type === 'log') {
+          appendLog(ev.kind, ev.text, elapsed);
+        }
+      }
+
+      if (currentTyping) { currentTyping.remove(); }
+      finishSteps();
+      bsMeta.textContent = `Scenario ${scenario.id} · risposta consegnata`;
+      running = false;
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    /* =====================================================================
+       SHORTCUT TASTIERA
+       ===================================================================== */
+    document.addEventListener('keydown', (e) => {
+      const idx = parseInt(e.key, 10);
+      if (idx >= 1 && idx <= SCENARIOS.length) {
+        runScenario(SCENARIOS[idx - 1]);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+mcs.metadata:
+  componentName: Work IQ User (Preview)
+kind: TaskDialog
+modelDisplayName: Work IQ User (Preview)
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: cra3b_Sharp4AiDemo.shared_a365memcp.shared-a365memcp-7ded694f-38fe-4ed9-a709-0eb6eab1ace5
+  connectionProperties:
+    mode: Invoker
+
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: mcp_MeServer

@@ -1,0 +1,602 @@
+﻿{
+  "swagger": "2.0",
+  "host": "muskrat-loved-openly.ngrok-free.app",
+  "schemes": [
+    "https"
+  ],
+  "definitions": {
+    "CrmTicket": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "ID del ticket",
+          "type": "string"
+        },
+        "ticket_No": {
+          "description": "Numero ticket",
+          "type": "string"
+        },
+        "ticket_Title": {
+          "description": "Titolo ticket",
+          "type": "string"
+        },
+        "description": {
+          "description": "Descrizione problema",
+          "type": "string"
+        },
+        "solution": {
+          "description": "Soluzione applicata",
+          "type": "string"
+        },
+        "ticketStatus": {
+          "description": "Stato del ticket",
+          "type": "string"
+        },
+        "createdTime": {
+          "description": "Data creazione",
+          "type": "string"
+        },
+        "modifiedTime": {
+          "description": "Data modifica",
+          "type": "string"
+        },
+        "email_From": {
+          "description": "Mittente email",
+          "type": "string"
+        },
+        "email_To": {
+          "description": "Destinatario email",
+          "type": "string"
+        },
+        "mailscanner_Action": {
+          "description": "Azione mailscanner",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProblemDetails": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "instance": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "RichiestaSendMailViewModel": {
+      "type": "object",
+      "properties": {
+        "cognome": {
+          "description": "Cognome del cliente",
+          "type": "string"
+        },
+        "nome": {
+          "description": "Nome del cliente",
+          "type": "string"
+        },
+        "telefono": {
+          "description": "Numero di telefono",
+          "type": "string"
+        },
+        "mail": {
+          "description": "Email del cliente",
+          "type": "string"
+        },
+        "tipologiaSegnalazione": {
+          "description": "Tipo di segnalazione",
+          "type": "string"
+        },
+        "descrizioneProblema": {
+          "description": "Descrizione del problema",
+          "type": "string"
+        },
+        "codiceIpa": {
+          "description": "Codice IPA",
+          "type": "string"
+        },
+        "nomeEnte": {
+          "description": "Nome dell\u0027ente",
+          "type": "string"
+        },
+        "codiceFiscalePartitaIva": {
+          "description": "CF o P.IVA",
+          "type": "string"
+        },
+        "dataRichiesta": {
+          "format": "date-time",
+          "description": "Data richiesta",
+          "type": "string"
+        },
+        "crmTickets": {
+          "description": "Ticket CRM correlati",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CrmTicket"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "SimilarityRequest": {
+      "required": [
+        "testo"
+      ],
+      "type": "object",
+      "properties": {
+        "testo": {
+          "description": "Testo da analizzare",
+          "minLength": 1,
+          "type": "string"
+        },
+        "categoria": {
+          "description": "Categoria di filtraggio",
+          "type": "string"
+        },
+        "topN": {
+          "format": "int32",
+          "description": "Numero di risultati simili da restituire",
+          "maximum": 10,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SimilarityResponse": {
+      "type": "object",
+      "properties": {
+        "tickets": {
+          "description": "Ticket simili trovati",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SimilarityTicket"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "SimilarityTicket": {
+      "type": "object",
+      "properties": {
+        "ticketId": {
+          "description": "ID del ticket",
+          "type": "string"
+        },
+        "titolo": {
+          "description": "Titolo del ticket",
+          "type": "string"
+        },
+        "soluzione": {
+          "description": "Soluzione del ticket",
+          "type": "string"
+        },
+        "similarity": {
+          "format": "double",
+          "description": "Livello di similarit\u00E0 (0-1)",
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "X-Api-Key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "x-ms-openai-manifest": {
+    "humanName": "InnovAI Demo API",
+    "modelDescription": "Un sistema utilizzato per ottenere, recuperare, trovare e visualizzare i ticket esistenti da un sistema CRM. Permette agli utenti di aggiornare, modificare e gestire ticket. Cerca le segnalazioni pi\u00F9 simili al testo fornito e arricchisce con ticket CRM.",
+    "contactEmail": "",
+    "legalUrl": ""
+  },
+  "info": {
+    "title": "InnovAI Demo API",
+    "version": "v1",
+    "description": "Un sistema utilizzato per ottenere, recuperare, trovare e visualizzare i ticket esistenti da un sistema CRM. Permette agli utenti di aggiornare, modificare e gestire ticket. Cerca le segnalazioni pi\u00F9 simili al testo fornito e arricchisce con ticket CRM."
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Verifica lo stato di salute dell\u0027API",
+        "description": "Controlla se l\u0027API \u00E8 online e funzionante",
+        "operationId": "CheckHealth",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "CheckHealth",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Verifica lo stato di salute dell\u0027API",
+              "description": "Controlla se l\u0027API \u00E8 online e funzionante"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/mailsenderjob": {
+      "post": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Invia email con segnalazione",
+        "description": "Invia una nuova segnalazione via email con tutti i dettagli del cliente",
+        "operationId": "SendMailJob",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RichiestaSendMailViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "SendMailJob",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Invia email con segnalazione",
+              "description": "Invia una nuova segnalazione via email con tutti i dettagli del cliente"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/mailsenderjobanonimo": {
+      "post": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Invia email anonima",
+        "description": "Invia una segnalazione email anonima senza dati personales",
+        "operationId": "SendMailJobAnonimo",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RichiestaSendMailViewModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "SendMailJobAnonimo",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Invia email anonima",
+              "description": "Invia una segnalazione email anonima senza dati personales"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/gettiposegnalazioni": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Ottieni tipi di segnalazione",
+        "description": "Restituisce la lista dei tipi di segnalazione disponibili per un ente",
+        "operationId": "GetTipiSegnalazioni",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "codiceIpaEnte",
+            "description": "Codice IPA dell\u0027ente",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "GetTipiSegnalazioni",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Ottieni tipi di segnalazione",
+              "description": "Restituisce la lista dei tipi di segnalazione disponibili per un ente"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/retrievesegnalazioni": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Recupera segnalazioni per utente",
+        "description": "Ottiene tutte le segnalazioni di un utente specifico",
+        "operationId": "RetrievSegnalazioni",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "codiceFiscale",
+            "description": "Codice fiscale del cliente",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "codiceIpaEnte",
+            "description": "Codice IPA dell\u0027ente",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RichiestaSendMailViewModel"
+              }
+            }
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "RetrievSegnalazioni",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Recupera segnalazioni per utente",
+              "description": "Ottiene tutte le segnalazioni di un utente specifico"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/segnalazioni/{id}/email": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Ottieni email di una segnalazione",
+        "description": "Recupera l\u0027email completa di una segnalazione specifica",
+        "operationId": "GetEmailSegnalazione",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "ID UUID della segnalazione",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "GetEmailSegnalazione",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Ottieni email di una segnalazione",
+              "description": "Recupera l\u0027email completa di una segnalazione specifica"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/segnalazioni": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Lista segnalazioni",
+        "description": "Ottiene la lista delle segnalazioni con filtro e limitazione",
+        "operationId": "ListSegnalazioni",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Numero massimo di risultati (default 100)",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          },
+          {
+            "in": "query",
+            "name": "codiceIpa",
+            "description": "Filtro per codice IPA",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "ListSegnalazioni",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Lista segnalazioni",
+              "description": "Ottiene la lista delle segnalazioni con filtro e limitazione"
+            }
+          ]
+        }
+      }
+    },
+    "/api/mail/getcrmdata": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "Ottieni dati CRM",
+        "description": "Recupera tutti i ticket CRM per un utente email",
+        "operationId": "GetCrmData",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "emailUtente",
+            "description": "Email dell\u0027utente",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CrmTicket"
+              }
+            }
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "GetCrmData",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Ottieni dati CRM",
+              "description": "Recupera tutti i ticket CRM per un utente email"
+            }
+          ]
+        }
+      }
+    },
+    "/api/similarity": {
+      "post": {
+        "tags": [
+          "Similarity"
+        ],
+        "summary": "Calcola similarit\u00E0 testo",
+        "description": "Analizza similarit\u00E0 tra testo e ticket CRM esistenti",
+        "operationId": "CalculateSimilarity",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SimilarityRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/SimilarityResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "x-ms-openai-data": {
+          "openai-enabled": true,
+          "operations": [
+            {
+              "operationId": "CalculateSimilarity",
+              "x-ms-require-user-confirmation": false,
+              "summary": "Calcola similarit\u00E0 testo",
+              "description": "Analizza similarit\u00E0 tra testo e ticket CRM esistenti"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

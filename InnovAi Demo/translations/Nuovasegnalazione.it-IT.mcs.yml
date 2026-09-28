@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Nuova segnalazione (it-IT)
+kind: AdaptiveDialog
+modelDescription: Deve catturare frasi come ""ho un problema", "segnalo un errore", "non funziona", "voglio segnalare", "c'è un bug"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  actions:
+    - kind: Question
+      id: question_U4v8tm
+      prompt: Descrivi brevemente il problema
+
+    - kind: Question
+      id: question_t5FAg4
+      prompt: `In quale categoria rientra? (tecnico / amministrativo / altro)`
+      entity:
+        kind: EmbeddedEntity
+        definition:
+          kind: ClosedListEntity
+          items:
+            - id: tecnico
+              displayName: tecnico
+
+            - id: amministrativo
+              displayName: amministrativo
+
+            - id: altro
+              displayName: altro
+
+    - kind: SendActivity
+      id: sendActivity_HjzSNS
+      activity: `Grazie. Sto cercando i casi simili già gestiti...`

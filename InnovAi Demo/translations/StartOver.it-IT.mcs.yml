@@ -1,0 +1,26 @@
+mcs.metadata:
+  componentName: Ricominciamo (it-IT)
+kind: AdaptiveDialog
+modelDescription: "Questo strumento è in grado di gestire query come queste: ripartiamo, riniziamo da zero, riparti ancora"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Start Over
+    triggerQueries:
+      - let's begin again
+      - start over
+      - start again
+      - restart
+
+  actions:
+    - kind: Question
+      id: question_zguoVV
+      prompt: Sei sicuro di voler ricomiciare daccapo?
+
+    - kind: ConditionGroup
+      id: conditionGroup_lvx2zV
+      elseActions:
+        - kind: SendActivity
+          id: sendMessage_lk2CyQ
+          activity: Ok. partiamo.

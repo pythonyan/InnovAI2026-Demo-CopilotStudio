@@ -1,0 +1,382 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "InnovAI Demo API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://muskrat-loved-openly.ngrok-free.app/",
+      "description": "InnovAI Demo API Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "CheckHealth",
+        "tags": ["Health"],
+        "summary": "Verifica lo stato di salute dell'API",
+        "description": "Controlla se l'API è online e funzionante",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/mail/mailsenderjob": {
+      "post": {
+        "operationId": "SendMailJob",
+        "tags": ["Mail"],
+        "summary": "Invia email con segnalazione",
+        "description": "Invia una nuova segnalazione via email con tutti i dettagli del cliente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RichiestaSendMailViewModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/mail/mailsenderjobanonimo": {
+      "post": {
+        "operationId": "SendMailJobAnonimo",
+        "tags": ["Mail"],
+        "summary": "Invia email anonima",
+        "description": "Invia una segnalazione email anonima senza dati personales",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RichiestaSendMailViewModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/mail/gettiposegnalazioni": {
+      "get": {
+        "operationId": "GetTipiSegnalazioni",
+        "tags": ["Mail"],
+        "summary": "Ottieni tipi di segnalazione",
+        "description": "Restituisce la lista dei tipi di segnalazione disponibili per un ente",
+        "parameters": [
+          {
+            "name": "codiceIpaEnte",
+            "in": "query",
+            "description": "Codice IPA dell'ente",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mail/retrievesegnalazioni": {
+      "get": {
+        "operationId": "RetrievSegnalazioni",
+        "tags": ["Mail"],
+        "summary": "Recupera segnalazioni per utente",
+        "description": "Ottiene tutte le segnalazioni di un utente specifico",
+        "parameters": [
+          {
+            "name": "codiceFiscale",
+            "in": "query",
+            "description": "Codice fiscale del cliente",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codiceIpaEnte",
+            "in": "query",
+            "description": "Codice IPA dell'ente",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RichiestaSendMailViewModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mail/segnalazioni/{id}/email": {
+      "get": {
+        "operationId": "GetEmailSegnalazione",
+        "tags": ["Mail"],
+        "summary": "Ottieni email di una segnalazione",
+        "description": "Recupera l'email completa di una segnalazione specifica",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID UUID della segnalazione",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/mail/segnalazioni": {
+      "get": {
+        "operationId": "ListSegnalazioni",
+        "tags": ["Mail"],
+        "summary": "Lista segnalazioni",
+        "description": "Ottiene la lista delle segnalazioni con filtro e limitazione",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Numero massimo di risultati (default 100)",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "codiceIpa",
+            "in": "query",
+            "description": "Filtro per codice IPA",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/mail/getcrmdata": {
+      "get": {
+        "operationId": "GetCrmData",
+        "tags": ["Mail"],
+        "summary": "Ottieni dati CRM",
+        "description": "Recupera tutti i ticket CRM per un utente email",
+        "parameters": [
+          {
+            "name": "emailUtente",
+            "in": "query",
+            "description": "Email dell'utente",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CrmTicket"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/similarity": {
+      "post": {
+        "operationId": "CalculateSimilarity",
+        "tags": ["Similarity"],
+        "summary": "Calcola similarità testo",
+        "description": "Analizza similarità tra testo e ticket CRM esistenti",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimilarityRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimilarityResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CrmTicket": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "description": "ID del ticket"},
+          "ticket_No": {"type": "string", "description": "Numero ticket"},
+          "ticket_Title": {"type": "string", "description": "Titolo ticket"},
+          "description": {"type": "string", "description": "Descrizione problema"},
+          "solution": {"type": "string", "description": "Soluzione applicata"},
+          "ticketStatus": {"type": "string", "description": "Stato del ticket"},
+          "createdTime": {"type": "string", "description": "Data creazione"},
+          "modifiedTime": {"type": "string", "description": "Data modifica"},
+          "email_From": {"type": "string", "description": "Mittente email"},
+          "email_To": {"type": "string", "description": "Destinatario email"},
+          "mailscanner_Action": {"type": "string", "description": "Azione mailscanner"}
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string"},
+          "title": {"type": "string"},
+          "status": {"type": "integer", "format": "int32"},
+          "detail": {"type": "string"},
+          "instance": {"type": "string"}
+        },
+        "additionalProperties": {}
+      },
+      "RichiestaSendMailViewModel": {
+        "type": "object",
+        "properties": {
+          "cognome": {"type": "string", "description": "Cognome del cliente"},
+          "nome": {"type": "string", "description": "Nome del cliente"},
+          "telefono": {"type": "string", "description": "Numero di telefono"},
+          "mail": {"type": "string", "description": "Email del cliente"},
+          "tipologiaSegnalazione": {"type": "string", "description": "Tipo di segnalazione"},
+          "descrizioneProblema": {"type": "string", "description": "Descrizione del problema"},
+          "codiceIpa": {"type": "string", "description": "Codice IPA"},
+          "nomeEnte": {"type": "string", "description": "Nome dell'ente"},
+          "codiceFiscalePartitaIva": {"type": "string", "description": "CF o P.IVA"},
+          "dataRichiesta": {"type": "string", "format": "date-time", "description": "Data richiesta"},
+          "crmTickets": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/CrmTicket"},
+            "description": "Ticket CRM correlati"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SimilarityRequest": {
+        "required": ["testo"],
+        "type": "object",
+        "properties": {
+          "testo": {"type": "string", "minLength": 1, "description": "Testo da analizzare"},
+          "categoria": {"type": "string", "description": "Categoria di filtraggio"},
+          "topN": {"type": "integer", "format": "int32", "minimum": 1, "maximum": 10, "description": "Numero di risultati simili da restituire"}
+        },
+        "additionalProperties": false
+      },
+      "SimilarityResponse": {
+        "type": "object",
+        "properties": {
+          "tickets": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/SimilarityTicket"},
+            "description": "Ticket simili trovati"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SimilarityTicket": {
+        "type": "object",
+        "properties": {
+          "ticketId": {"type": "string", "description": "ID del ticket"},
+          "titolo": {"type": "string", "description": "Titolo del ticket"},
+          "soluzione": {"type": "string", "description": "Soluzione del ticket"},
+          "similarity": {"type": "number", "format": "double", "description": "Livello di similarità (0-1)"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "API Key per /api/similarity",
+        "name": "X-Api-Key",
+        "in": "header"
+      }
+    }
+  },
+  "security": [{"ApiKey": []}]
+}

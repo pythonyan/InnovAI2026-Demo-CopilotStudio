@@ -1,0 +1,29 @@
+mcs.metadata:
+  componentName: Saluti
+  description: This topic is triggered when the user greets the agent.
+kind: AdaptiveDialog
+modelDescription: "Questo strumento è in grado di gestire query come queste: Buon pomeriggio, Buongiorno, Buonasera, Ciao, Salve"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Greeting
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - Good afternoon
+      - Good morning
+      - Hello
+      - Hey
+      - Hi
+
+  actions:
+    - kind: SendActivity
+      id: sendMessage_abmysR
+      activity:
+        text:
+          - Ciao, come posso aiutarti?
+        speak:
+          - Hello, <break strength="medium" /> how can I help?
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_01At22
